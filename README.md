@@ -32,7 +32,8 @@ Node.js 18+ and npm.
 ```sh
 npm install
 npm run dev     # local development
-npm test        # 93 unit/integration tests (node:test, zero test deps)
+npm test        # 111 unit/integration tests (node:test, zero test deps)
+npm run test:e2e  # 15 Playwright browser tests (needs build + Chromium)
 npm run test:parity  # manual check vs upstream Python (needs Python + upstream files)
 npm run lint
 npm run build   # production build (static output)

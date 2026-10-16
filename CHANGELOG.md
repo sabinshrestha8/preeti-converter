@@ -3,6 +3,12 @@
 All notable changes to Preeti Converter are documented here.
 Format follows Keep a Changelog (concise variant).
 
+## [Unreleased]
+### Added
+- Playwright end-to-end suite (15 tests: text flows, clipboard, swap,
+  DOCX upload/convert/download, error states, keyboard, mobile layout).
+- Single top-level heading for SEO/accessibility.
+
 ## [0.1.0] - 2026-10-16
 
 ### Added

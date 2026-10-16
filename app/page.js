@@ -19,7 +19,7 @@ export default function Home() {
     <>
       <header className="site-header">
         <div className="wrap">
-          <p className="brand">Preeti Converter</p>
+          <h1 className="brand">Preeti Converter</h1>
           <p className="tagline">Free Nepali Preeti ↔ Unicode converter. Private by design: everything runs in your browser.</p>
         </div>
       </header>

@@ -3,7 +3,10 @@
 Framework: Node built-in test runner (`node:test` + `node:assert/strict`), zero
 test dependencies. Commands:
 
-- `npm test` — converter + document suites (93 tests, all passing).
+- `npm test` — converter + document suites (111 tests, all passing).
+- `npm run test:e2e` — 15 Playwright browser tests against the production
+  build (text flows, clipboard, swap, DOCX upload/convert/download, error
+  states, keyboard, mobile layout; Chromium).
 - `npm run test:parity` — manual upstream-parity harness (needs Python and the
   two MIT upstream files in `%TEMP%`; last run 58/58 accounted).
 - `npm run lint`, `npm run build` — clean.
@@ -28,9 +31,9 @@ byte-identical media/rels, unchanged input hash, structure regexes.
 
 ## Known gaps (honest)
 
-- No automated browser/UI tests (React Testing Library/Playwright not installed;
-  UI verified via production build + manual pass). Recommended next.
-- No real Microsoft Word round-trip (no Word license in this environment);
-  integrity is established structurally. Recommended before launch claims.
+- Playwright covers customer journeys in Chromium only (no Firefox/WebKit
+  matrix yet) and cannot open output in real Microsoft Word (no Word license
+  in this environment); document integrity is established structurally.
+  A real-Word round-trip remains recommended before launch claims.
 - Performance measured on synthetic docs; a corpus of real 30–40-page
   government documents should be timed during pilot.

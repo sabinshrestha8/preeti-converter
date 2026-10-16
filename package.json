@@ -9,6 +9,7 @@
     "start": "next start",
     "lint": "eslint",
     "test": "node --test tests/converter.test.js tests/document.test.js",
+    "test:e2e": "playwright test",
     "test:parity": "node tests/parity-upstream.mjs"
   },
   "dependencies": {
@@ -19,6 +20,7 @@
     "react-dom": "19.3.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
     "eslint": "^9",
     "eslint-config-next": "16.4.1"
   }
