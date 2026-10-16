@@ -17,6 +17,7 @@ export const metadata = {
     siteName: "Preeti Converter",
   },
   robots: { index: true, follow: true },
+  icons: { icon: "/icon.svg" },
 };
 
 export const viewport = {
