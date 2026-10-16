@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import Converter from "../components/Converter.js";
 import DocumentUploader from "../components/DocumentUploader.js";
 
@@ -130,6 +131,9 @@ export default function Home() {
 
       <footer className="wrap site-footer">
         <p>Preeti Converter — free, local, no sign-up. Preeti → Unicode and Unicode → Preeti for text and .docx files.</p>
+        <p>
+          <Link href="/privacy">Privacy policy</Link>
+        </p>
       </footer>
     </>
   );
