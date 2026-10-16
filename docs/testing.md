@@ -1,0 +1,36 @@
+# Testing
+
+Framework: Node built-in test runner (`node:test` + `node:assert/strict`), zero
+test dependencies. Commands:
+
+- `npm test` — converter + document suites (93 tests, all passing).
+- `npm run test:parity` — manual upstream-parity harness (needs Python and the
+  two MIT upstream files in `%TEMP%`; last run 58/58 accounted).
+- `npm run lint`, `npm run build` — clean.
+
+## Mapping fixtures
+
+`tests/converter.test.js` uses hand-checked expectations from published
+examples (`g]kfn`↔`नेपाल`, `sf7df08"`→`काठमाण्डू`, `/fd`→`राम`) plus
+code-point analysis — never the converter's own output. Covers vowels, vowel
+signs, conjuncts, reph, half-forms, digits, punctuation, mixed/multiline text,
+empty input, non-string input, a long paragraph, and lossless/lossy round trips.
+
+## DOCX fixtures
+
+Synthetic packages built in-code with JSZip (no binaries in the repo):
+one-paragraph, multi-paragraph, bold/italic, font sizes, headings, tables,
+lists (numbering preserved structurally), headers/footers, hyperlinks, 1px PNG
+image, page breaks, split runs, empty runs, 800-paragraph long document
+(~0.35 s), malformed ZIPs, missing `document.xml`, oversized input, unknown
+direction. Integrity checks: ZIP magic, required parts, parseable XML,
+byte-identical media/rels, unchanged input hash, structure regexes.
+
+## Known gaps (honest)
+
+- No automated browser/UI tests (React Testing Library/Playwright not installed;
+  UI verified via production build + manual pass). Recommended next.
+- No real Microsoft Word round-trip (no Word license in this environment);
+  integrity is established structurally. Recommended before launch claims.
+- Performance measured on synthetic docs; a corpus of real 30–40-page
+  government documents should be timed during pilot.
