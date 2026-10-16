@@ -4,10 +4,14 @@ All notable changes to Preeti Converter are documented here.
 Format follows Keep a Changelog (concise variant).
 
 ## [Unreleased]
+
+## [0.2.0] - 2026-10-16
 ### Added
 - Playwright end-to-end suite (15 tests: text flows, clipboard, swap,
   DOCX upload/convert/download, error states, keyboard, mobile layout).
 - Single top-level heading for SEO/accessibility.
+- Completed au-kar folds (`f}`→ौ, `cf]`→ओ, `cf}`→औ) and `ª`→ङ round-trip.
+- GitHub Actions job running the browser tests.
 
 ## [0.1.0] - 2026-10-16
 
