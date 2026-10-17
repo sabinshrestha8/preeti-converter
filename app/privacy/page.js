@@ -23,12 +23,13 @@ export default function Privacy() {
   return (
     <main className="wrap">
       <section aria-labelledby="privacy-heading">
-        <h2 id="privacy-heading">Privacy policy</h2>
+        <h1 id="privacy-heading">Privacy policy</h1>
         <p>
           Preeti Converter processes your text and Word documents{" "}
-          <strong>locally in your browser tab</strong>. There is no server side
-          to this application: no accounts, no uploads, no document storage, no
-          analytics, and no logs of what you convert.
+          <strong>locally in your browser tab</strong>. The web server only
+          delivers the page; your text and documents are never sent to it. There
+          are no accounts, no uploads, no document storage, no analytics, and no
+          logs of what you convert.
         </p>
         <h3>What stays on your device</h3>
         <ul>
