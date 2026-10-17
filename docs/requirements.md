@@ -38,5 +38,6 @@ image-to-text, exact PDF layout reproduction, text-based PDF conversion
 
 Text uses the real engine both ways with independent fixtures; DOCX converts
 both ways and reopens with structure intact; privacy claims match the
-implementation; lint + 93 automated tests + production build pass; limitations
+implementation; lint, the unit/integration and Playwright suites (see `docs/testing.md`) and the
+production build pass; limitations
 are documented, not hidden.

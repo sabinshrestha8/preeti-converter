@@ -1,7 +1,8 @@
 # Architecture
 
-Next.js App Router (static output), React, plain CSS. No database, no auth, no
-API routes, no server state — every conversion runs in the browser.
+Next.js App Router (served by `next start`; pages are prerendered), React,
+plain CSS. No database, no auth, no API routes, no server state — every
+conversion runs in the browser.
 
 ```mermaid
 flowchart LR
@@ -48,6 +49,6 @@ dependencies. No Redux, no backend, no paid service.
 
 ## Deployment
 
-`next build` produces fully static output (`○ /`, `○ /robots.txt`, `ƒ /sitemap.xml`),
-hostable on any static host at near-zero cost. Set `NEXT_PUBLIC_SITE_URL` to
-the production origin (defaults to a marked placeholder).
+`next build` produces Next.js server output (`○ /`, `○ /robots.txt`,
+`ƒ /sitemap.xml`) served with `next start` on Node 20.9+ — not a static
+export. Set `NEXT_PUBLIC_SITE_URL` at build time. See `docs/deployment.md`.

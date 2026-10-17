@@ -2,11 +2,14 @@
 
 ## Now (launch blockers)
 
-1. Open one real converted `.docx` in Microsoft Word + LibreOffice and confirm
-   rendering; record results here.
-2. Add automated browser tests (Playwright smoke: type → convert → copy;
-   upload → convert → download) — currently the honest gap in `docs/testing.md`.
-3. Set `NEXT_PUBLIC_SITE_URL`, deploy to a static host, verify sitemap/robots.
+1. Open real converted `.docx` files in Microsoft Word + LibreOffice and confirm
+   rendering; record results here (see `docs/release-readiness-audit.md`).
+2. Choose a license for this project (upstream notices are in
+   `THIRD_PARTY_NOTICES.md`).
+3. Set `NEXT_PUBLIC_SITE_URL` at build time, deploy to a Node host, verify
+   canonical/sitemap/robots.
+
+Done: Playwright browser tests (run in CI since 0.2.0).
 
 ## Next
 
