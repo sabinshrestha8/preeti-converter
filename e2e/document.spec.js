@@ -106,6 +106,7 @@ const conversionErrors = [
     async () => Buffer.from([0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1]),
     /password-protected or in the old Word 97-2003/,
   ],
+  ["a Unicode document sent to Preeti → Unicode", makeUnicodeDocx, /already looks like Unicode.*Did you mean Unicode → Preeti\?/],
 ];
 for (const [name, make, message] of conversionErrors) {
   test(`shows a specific error for ${name}`, async ({ page }) => {

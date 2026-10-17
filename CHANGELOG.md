@@ -27,6 +27,9 @@ Format follows Keep a Changelog (concise variant).
   entities) is rejected with a plain message; raw parser messages are no
   longer shown.
 - DOCX: password-protected and legacy `.doc` (OLE) files get a specific message.
+- DOCX: a document that is already mostly Unicode Devanagari is refused in
+  Preeti → Unicode with "Did you mean Unicode → Preeti?" (it used to "convert"
+  its digits, e.g. `1.` → ज्ञ।).
 - DOCX: switched runs also set the complex-script font `w:cs` (used by Word
   for Devanagari) and drop overriding theme-font attributes.
 - Uploader: download object URLs are released on new file, re-convert,
@@ -36,8 +39,8 @@ Format follows Keep a Changelog (concise variant).
 
 ### Added
 - `THIRD_PARTY_NOTICES.md` with the upstream MIT license text; About tab credit.
-- Regression tests (unit 111 → 165, Playwright 15 → 26), parity fixtures
-  58 → 80. `docs/release-readiness-audit.md`.
+- Regression tests (unit 111 → 168, Playwright 15 → 27), parity fixtures
+  58 → 82. `docs/release-readiness-audit.md`.
 
 ### Changed
 - Docs corrected: the app deploys as a Next.js Node server (not static

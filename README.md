@@ -32,8 +32,8 @@ Node.js 20.9+ (required by Next.js 16) and npm.
 ```sh
 npm install
 npm run dev     # local development
-npm test        # 165 unit/integration tests (node:test)
-npm run test:e2e  # 26 Playwright browser tests (needs build + Chromium; also run in CI)
+npm test        # 168 unit/integration tests (node:test)
+npm run test:e2e  # 27 Playwright browser tests (needs build + Chromium; also run in CI)
 npm run test:parity  # manual check vs upstream Python (needs Python + upstream files)
 npm run lint
 npm run build   # production build (Next.js server output, not a static export)
@@ -50,8 +50,8 @@ A JavaScript port of the MIT-licensed
 [PreetiToUnicode](https://github.com/globalpolicy/PreetiToUnicode) and
 [UnicodeToPreeti](https://github.com/globalpolicy/UnicodeToPreeti) implementations,
 with fixes for upstream reph/ikar reordering bugs and added round-trip
-mappings. Checked against upstream on 80 shared fixtures
-(`checked=80 mismatches=0 intentional=21`, every deviation listed in
+mappings. Checked against upstream on 82 shared fixtures
+(`checked=82 mismatches=0 intentional=22`, every deviation listed in
 `tests/parity-upstream.mjs`). Details and limitations:
 `docs/conversion-engine.md`, `docs/conversion-rules.md`. License notices:
 `THIRD_PARTY_NOTICES.md`.

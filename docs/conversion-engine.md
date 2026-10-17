@@ -69,13 +69,13 @@ and permission notice to be included). The full notice is in
 
 ## Verification evidence
 
-- `tests/converter.test.js`: 131 tests with hand-checked fixtures (canonical
+- `tests/converter.test.js`: 132 tests with hand-checked fixtures (canonical
   `g]kfn`↔`नेपाल` from multiple published READMEs, `sf7df08"`→`काठमाण्डू`,
   `/fd`→`राम`, digits, conjuncts, reph, ikar, round trips). All pass.
 - `tests/parity-upstream.mjs` (`npm run test:parity`, needs Python + the two
-  upstream files): 80 shared fixtures — 59 byte-identical, 18 fixed upstream
-  bugs, 3 added mappings. Result on 2026-10-17:
-  `checked=80 mismatches=0 intentional=21`.
+  upstream files): 82 shared fixtures — 60 byte-identical, 17 fixed upstream
+  bugs, 5 added mappings. Result on 2026-10-17:
+  `checked=82 mismatches=0 intentional=22`.
 
 ## Known limitations
 

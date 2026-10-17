@@ -24,11 +24,11 @@ common words converting wrongly with every test green.
 
 | Command | Result |
 |---|---|
-| `npm test` | ✅ 165 tests, 165 pass (`converter.test.js` 131, `document.test.js` 34) |
+| `npm test` | ✅ 168 tests, 168 pass (`converter.test.js` 132, `document.test.js` 36) |
 | `npm run lint` | ✅ exit 0 |
 | `npm run build` | ✅ exit 0; same route table as baseline |
-| `npm run test:e2e` | ✅ 26 tests, 26 pass (Chromium) |
-| `npm run test:parity` | ✅ `checked=80 mismatches=0 intentional=21` |
+| `npm run test:e2e` | ✅ 27 tests, 27 pass (Chromium) |
+| `npm run test:parity` | ✅ `checked=82 mismatches=0 intentional=22` |
 | `npm audit --omit=dev` | ✅ 0 vulnerabilities in runtime dependencies |
 | `npm audit` | ⚠️ 5 high, all dev-only (`braces` via `micromatch` → `fast-glob` → `@next/eslint-plugin-next`); not shipped to users |
 | `NEXT_PUBLIC_SITE_URL=https://staging.test.invalid npm run build` + `next start` | ✅ canonical, `og:url`, robots `Sitemap:` and sitemap `<loc>` all used the variable; rebuilt without it afterwards |
@@ -85,6 +85,7 @@ already in the input is never reordered (tested).
 | D8 | P2 | Parsing and conversion run on the main thread (no Worker) | `DocumentUploader.js` | ⏳ 1,600 paragraphs take ≈0.6 s in Node; browser timing on low-end hardware not measured |
 | D9 | P2 | Existing hyperlink test used `w:hyperLink` (wrong case), so the hyperlink merge barrier was never exercised | `tests/document.test.js` L173 | ✅ added a correct `w:hyperlink` test (old test kept) |
 | D10 | P2 | Not converted: charts, SmartArt, glossary parts, `w:sym` | `TEXT_PART_PATTERN` | 📝 documented |
+| D11 | P1 | A Unicode document sent to Preeti → Unicode "converted" 710 of 742 runs: the Nepali stayed as it was, and `1.` became ज्ञ। | real test document | ✅ refused when Devanagari outnumbers ASCII, with "Did you mean Unicode → Preeti?" |
 
 ### UI, privacy, SEO
 

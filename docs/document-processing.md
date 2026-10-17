@@ -49,8 +49,13 @@ formatting, which is exactly what this product must preserve.
      message; parser messages are never shown.
    - A run that fails conversion is left untouched — one bad run never breaks
      a document.
-4. Serialize back into the same ZIP entry; regenerate with DEFLATE.
-5. Input bytes are never mutated (`JSZip.loadAsync` copies).
+4. Preeti→Unicode only: if the text parts hold more Devanagari characters
+   than ASCII characters, the document is already Unicode and is rejected
+   with "Did you mean Unicode → Preeti?" (otherwise its digits and English
+   would be garbled). A majority test, so a Preeti document with some
+   Unicode in it still converts.
+5. Serialize back into the same ZIP entry; regenerate with DEFLATE.
+6. Input bytes are never mutated (`JSZip.loadAsync` copies).
 
 ## Run-boundary handling
 

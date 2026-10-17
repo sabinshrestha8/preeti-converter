@@ -3,9 +3,9 @@
 Unit/integration: Node built-in test runner (`node:test` +
 `node:assert/strict`). Browser: `@playwright/test` (dev dependency). Commands:
 
-- `npm test` — 165 tests: `tests/converter.test.js` (131) and
-  `tests/document.test.js` (34).
-- `npm run test:e2e` — 26 Playwright tests against the production build
+- `npm test` — 168 tests: `tests/converter.test.js` (132) and
+  `tests/document.test.js` (36).
+- `npm run test:e2e` — 27 Playwright tests against the production build
   (`next start` on port 3100; Chromium only): both text directions with exact
   output, sample/clear/counts, copy, swap, DOCX upload → convert → download
   with the downloaded XML inspected in both directions, oversized/empty/
@@ -16,7 +16,7 @@ Unit/integration: Node built-in test runner (`node:test` +
   `verify`, and build + `npm run test:e2e` in job `e2e`, on every push and PR.
 - `npm run test:parity` — **manual, not in CI**: compares against the upstream
   Python (needs Python and the two upstream files in `%TEMP%`). Last run
-  2026-10-17: `checked=80 mismatches=0 intentional=21`.
+  2026-10-17: `checked=82 mismatches=0 intentional=22`.
 - `npm run lint`, `npm run build` — clean.
 
 ## Mapping fixtures

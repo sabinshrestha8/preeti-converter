@@ -338,6 +338,21 @@ describe("DOCX regressions: parts, fonts and structure", () => {
   });
 });
 
+describe("DOCX regressions: wrong direction", () => {
+  it("refuses Preeti -> Unicode on a document that is already Unicode", async () => {
+    // Real case: numbered Mangal paragraphs came out as ज्ञ। for "1.".
+    const input = await makeDocx({ bodyInner: para(run("1. सबैलाई नमस्कार", { font: "Mangal" })) });
+    await assert.rejects(convertDocx(input, DIRECTIONS.PREETI_TO_UNICODE), /already looks like Unicode.*Unicode → Preeti/);
+  });
+
+  it("still converts a Preeti document with a little Unicode in it", async () => {
+    const input = await makeDocx({ bodyInner: para(run("g]kfn ;/sf/", { font: "Preeti" }), run("नेपाल", { font: "Mangal" })) });
+    const { data } = await convertDocx(input, DIRECTIONS.PREETI_TO_UNICODE);
+    const xml = await (await JSZip.loadAsync(data)).files["word/document.xml"].async("string");
+    assert.deepEqual(textsOf(xml), ["नेपाल सरकार", "नेपाल"]);
+  });
+});
+
 describe("DOCX regressions: unsafe and damaged input", () => {
   it("rejects password-protected / legacy .doc (OLE) files with a specific message", async () => {
     const ole = new Uint8Array([0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1, 0, 0]);
