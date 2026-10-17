@@ -58,8 +58,9 @@ describe("Preeti -> Unicode", () => {
     assert.equal(convertPreetiToUnicode("A"), "ब्");
   });
 
-  it("known limitation: O{ (ई) reads back as र्इ, not ई", () => {
-    assert.equal(convertPreetiToUnicode("O{"), "र्इ");
+  it("O{ (ई) reads back as ई, not र्इ", () => {
+    assert.equal(convertPreetiToUnicode("O{"), "ई");
+    assert.equal(convertPreetiToUnicode(";a}nfO{"), "सबैलाई");
   });
 
   it("trailing ikar is kept, not silently dropped (split-run safety)", () => {
@@ -142,9 +143,12 @@ describe("dispatcher + round trips", () => {
     // क्ष (If) does not survive a P->U->P trip through 'I'.
     assert.equal(convertPreetiToUnicode("I"), "क्ष्");
     assert.equal(convertUnicodeToPreeti("क्ष्"), "If\\");
-    // Lone 'pm' (from ऊ) reads back as उफ: kept deliberately, since folding
-    // pm->ऊ would corrupt genuine उ+फ sequences.
-    assert.equal(convertPreetiToUnicode("pm"), "उफ");
+  });
+
+  it("pm reads back as ऊ; a genuine उफ is typed pkm", () => {
+    assert.equal(convertPreetiToUnicode("pm"), "ऊ");
+    assert.equal(convertPreetiToUnicode("pkm"), "उफ");
+    assert.equal(convertUnicodeToPreeti("उफ"), "pkm");
   });
 });
 
@@ -233,8 +237,9 @@ describe("regressions: sentence round trips", () => {
     });
   }
 
-  it("pinned lossy round trips: ई and ऊ", () => {
-    assert.equal(convertPreetiToUnicode(convertUnicodeToPreeti("ईश्वर")), "र्इश्वर");
-    assert.equal(convertPreetiToUnicode(convertUnicodeToPreeti("ऊर्जा")), "उफर्जा");
+  it("ई and ऊ round trip", () => {
+    for (const s of ["ईश्वर", "ऊर्जा", "सबैलाई ऊन"]) {
+      assert.equal(convertPreetiToUnicode(convertUnicodeToPreeti(s)), s);
+    }
   });
 });

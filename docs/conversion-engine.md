@@ -45,7 +45,7 @@ and permission notice to be included). The full notice is in
    `try/except IndexError`, so a reph at end-of-string aborts the whole branch:
    `s{`→कर् (wrong), `O{`→इर्, `र्क`→`/\\s` (broken). The JS port compares
    against `undefined` instead of throwing, completing the branch: `s{`→र्क,
-   `र्क`→`s{`. Linguistically correct and round-trips.
+   `र्क`→`s{` (`O{` is now folded to ई, see 6). Linguistically correct and round-trips.
 2. **Two mappings added.** Upstream U2P emits `¿` (रू) and `«` (ra-foot after
    ट/ठ/ड) but upstream P2U cannot read them back (silent loss). The port maps
    `¿`→रू and `«`→्र.
@@ -62,6 +62,10 @@ and permission notice to be included). The full notice is in
    post-replacements to English (`Simple`→`Imple`). All fixed; each case is
    listed in `tests/parity-upstream.mjs` and pinned in `tests/converter.test.js`.
    `´`→झ added (U2P emits it; upstream cannot read it back).
+6. **ई and ऊ read back (2026-10-17).** Upstream U2P writes ई as `O{` and ऊ
+   as `pm`, but upstream P2U reads them as इर्/उफ. The port folds `O{`→ई and
+   `pm`→ऊ: reph never sits on a bare इ in Nepali, and a genuine उफ is typed
+   `pkm`.
 
 ## Verification evidence
 
@@ -83,9 +87,6 @@ and permission notice to be included). The full notice is in
   through and read back as Preeti keys (`?`→रु).
 - Unicode → Preeti turns `-` into a space (upstream mapping) and leaves ऋ, ः
   and ऐ as Unicode (no Preeti mapping). Pinned by tests.
-- `O{` (ई) reads back as र्इ, and lone `pm` (from ऊ) reads back as उफ:
-  upstream ambiguities kept deliberately (fixing them would corrupt the
-  rarer genuine reph/`उफ` cases). Both are locked by tests.
 - Round trips are lossless for the tested subset only; see `tests/` for the
   documented lossy cases (`I`→क्ष् one-way, `qm` one-way normalization).
 - No normalization is applied to legacy-encoded input before mapping (it is not

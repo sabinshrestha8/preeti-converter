@@ -14,6 +14,8 @@ Format follows Keep a Changelog (concise variant).
 - Preeti → Unicode: `If]`/`0f]`/`if]` now give क्षे/णे/षे (the `f]` fold ran
   first and produced क्ष्ो).
 - Preeti → Unicode: `´` reads back as झ (Unicode → Preeti already emitted it).
+- Preeti → Unicode: `O{` reads back as ई (was र्इ, e.g. सबैलाई) and `pm` as
+  ऊ (was उफ), so ई/ऊ now round-trip.
 - Unicode → Preeti: ra-foot + ikar (`प्रिय`→`lk|o`, was `k|lo`) and reph over
   half-form clusters (`मर्त्य`→`dTo{`, was `d/\To`).
 - Unicode → Preeti: English words pass through unchanged (`Simple` was

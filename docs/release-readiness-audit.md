@@ -54,8 +54,8 @@ Status: ✅ fixed with regression test · 📝 documented/pinned, not changed ·
 | C6 | P1 | U2P reph over a half-form cluster fell back to a visible halant | `मर्त्य`→`d/\To` | ✅ |
 | C7 | P1 | U2P post-replacements rewrote English | `ORDERED_POST` L158-170: `Simple`→`Imple`, `Tt`→`Q` | ✅ |
 | C8 | P1 | झ lost on every round trip | U2P emits `´`; `mappings.js` had no `´` | ✅ |
-| C9 | P2 | U2P `-`→space; Latin digits and ASCII `? . / ; : ' "` pass through and read back as Preeti keys; ऋ ः ऐ have no Preeti mapping | `UNICODE_TO_PREETI` L84 | 📝 pinned in `converter.test.js` |
-| C10 | P2 | ई→`O{`→र्इ and ऊ→`pm`→उफ round trips | existing, documented | 📝 |
+| C9 | P1 | U2P `-`→space; Latin digits and ASCII `? . / ; : ' "` pass through and read back as Preeti keys; ऋ ः ऐ have no Preeti mapping. In the real test document 710 of 742 runs had Latin digits, so `1.` displays as ज्ञ। in the Preeti output | `UNICODE_TO_PREETI` L84 | 📝 pinned in `converter.test.js`; README tells users to use Devanagari digits (owner chose not to change) |
+| C10 | P1 | ई→`O{`→र्इ and ऊ→`pm`→उफ round trips. A real 742-paragraph test document had ई in 280 runs (सबैलाई) | `PRE_NORMALIZATIONS` | ✅ `O{`→ई, `pm`→ऊ folded (a genuine उफ is `pkm`) |
 | C11 | P2 | P2U treats English letters as Preeti keystrokes (`Hello`→garbage) | inherent to the encoding | 📝 |
 
 C1–C7 also exist in the upstream Python; the parity harness now lists each one
@@ -132,7 +132,8 @@ already in the input is never reordered (tested).
   - Latin digits
   - mixed English both ways
   - six sentence-level round trips
-  - pinned lossy cases (hyphen, digits, ASCII punctuation, ऋ/ः/ऐ, ई, ऊ)
+  - pinned lossy cases (hyphen, digits, ASCII punctuation, ऋ/ः/ऐ)
+  - ई/ऊ read-back and round trips
 - `tests/document.test.js` (+13):
   - footnotes/endnotes/comments
   - `w:cs` + theme

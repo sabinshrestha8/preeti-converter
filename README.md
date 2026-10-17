@@ -63,8 +63,10 @@ See `docs/privacy-security.md`.
 
 ## Known limitations
 
-- Round trips are not always exact (ई, ऊ, hyphens, Latin digits and ASCII
+- Round trips are not always exact (hyphens, Latin digits and ASCII
   punctuation; pinned in `tests/converter.test.js`).
+- Unicode → Preeti leaves Latin digits as-is, and the Preeti font draws them
+  as conjuncts (`1.` shows as ज्ञ।). Use Devanagari digits (१२३) in the source.
 - A syllable split across two differently formatted Word runs converts per-run.
 - Preeti → Unicode reads every English letter/digit as a Preeti keystroke —
   including English text in other fonts (e.g. Calibri) inside a `.docx`.
