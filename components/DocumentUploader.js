@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { DIRECTIONS } from "../lib/converter/index.js";
 import { MAX_FILE_BYTES } from "../lib/document/validate-docx.js";
 
@@ -20,6 +20,16 @@ export default function DocumentUploader() {
   const [result, setResult] = useState(null); // { url, filename, stats }
   const [dragOver, setDragOver] = useState(false);
   const inputRef = useRef(null);
+
+  // Free the converted file's memory whenever the result is replaced or
+  // cleared (new file, re-convert, reset, direction change) and on unmount.
+  useEffect(() => () => result && URL.revokeObjectURL(result.url), [result]);
+
+  function chooseDirection(d) {
+    setDirection(d);
+    setResult(null); // a download for the other direction would be stale
+    setError("");
+  }
 
   function pickFile(list) {
     setError("");
@@ -66,7 +76,6 @@ export default function DocumentUploader() {
   }
 
   function reset() {
-    if (result) URL.revokeObjectURL(result.url);
     setFile(null);
     setResult(null);
     setError("");
@@ -86,7 +95,8 @@ export default function DocumentUploader() {
           type="button"
           className={direction === DIRECTIONS.PREETI_TO_UNICODE ? "tab active" : "tab"}
           aria-pressed={direction === DIRECTIONS.PREETI_TO_UNICODE}
-          onClick={() => setDirection(DIRECTIONS.PREETI_TO_UNICODE)}
+          disabled={busy}
+          onClick={() => chooseDirection(DIRECTIONS.PREETI_TO_UNICODE)}
         >
           Preeti → Unicode
         </button>
@@ -94,7 +104,8 @@ export default function DocumentUploader() {
           type="button"
           className={direction === DIRECTIONS.UNICODE_TO_PREETI ? "tab active" : "tab"}
           aria-pressed={direction === DIRECTIONS.UNICODE_TO_PREETI}
-          onClick={() => setDirection(DIRECTIONS.UNICODE_TO_PREETI)}
+          disabled={busy}
+          onClick={() => chooseDirection(DIRECTIONS.UNICODE_TO_PREETI)}
         >
           Unicode → Preeti
         </button>
