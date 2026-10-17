@@ -1,8 +1,9 @@
 // Parity harness: runs upstream Python functions vs this JS port on shared fixtures.
 // Manual verification only (needs Python + the two upstream MIT files saved as
 // %TEMP%\p2u.py and %TEMP%\u2p.py). Run with: npm run test:parity
-// Last result (2026-10-15): checked=58 mismatches=0 intentional=5
-// (3 upstream end-of-string reph bugs fixed, 2 round-trip mappings added).
+// Last result (2026-10-17): checked=80 mismatches=0 intentional=21
+// (3 upstream end-of-string reph bugs, 15 upstream reordering bugs fixed,
+// 3 round-trip mappings added).
 // The upstream files end with argparse CLI code that executes on import, so we
 // extract only the function definitions (everything before "argparser=").
 import { execFileSync } from "node:child_process";
@@ -19,8 +20,8 @@ function loadUpstream(pyFile, entry) {
 }
 
 // Fixtures covering both directions (Preeti inputs + Unicode inputs).
-const PREETI_INPUTS = ["g]kfn", "g]kfn ;/sf/", 'sf7df08"', "/fd", "cf", "km", "0f", "If", "if", "f]", "q", "Q", "s{", "lg", "!@#", ".", "=", "+", "\\", "i", "S", ">", "?", "O{", "å", "1", "qm", "lgkfn", "k|m", "em", "6«", "¿"];
-const UNI_INPUTS = ["नेपाल", "नेपाल सरकार", "राम", "अ आ इ उ", "आ", "फ", "त्र", "त्त", "क्ष", "ज्ञ", "श्र", "क्र", "र्क", "कि", "रु", "रू", "१२३", "।", "कि", "द्व", "ट्रक", "क्रम", "वार्ता", "ई", "क्ष्", "Hello 123"];
+const PREETI_INPUTS = ["g]kfn", "g]kfn ;/sf/", 'sf7df08"', "/fd", "cf", "km", "0f", "If", "if", "f]", "q", "Q", "s{", "lg", "!@#", ".", "=", "+", "\\", "i", "S", ">", "?", "O{", "å", "1", "qm", "lgkfn", "k|m", "em", "6«", "¿", "l:ylt", "JolSt", "lIf", "cfly{s", "sLlt{ sf", "sfTof{", "If]", "0f]", "if]", "lk|o", "dTo{", "´"];
+const UNI_INPUTS = ["नेपाल", "नेपाल सरकार", "राम", "अ आ इ उ", "आ", "फ", "त्र", "त्त", "क्ष", "ज्ञ", "श्र", "क्र", "र्क", "कि", "रु", "रू", "१२३", "।", "कि", "द्व", "ट्रक", "क्रम", "वार्ता", "ई", "क्ष्", "Hello 123", "प्रिय", "क्रिया", "मर्त्य", "स्थिति", "व्यक्ति", "क्षेत्र", "आर्थिक", "राष्ट्रिय", "Simple Tt", "झ"];
 
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), "parity-"));
 const p2uSrc = fs.readFileSync(process.env.TEMP + "\\p2u.py", "utf8");
@@ -52,12 +53,34 @@ const EXPECTED_DEVIATIONS = new Map([
   ["P2U:O{", "र्इ"],
   ["U2P:र्क", "s{"],
 ]);
+// Upstream reordering bugs fixed in the JS port (see CHANGELOG [Unreleased]):
+// upstream attaches ikar after one keystroke instead of the whole cluster,
+// moves reph over one keystroke only, folds f] before If/0f/if, and runs its
+// post-replacements over English words.
+const FIXED_UPSTREAM_BUGS = new Map([
+  ["P2U:l:ylt", "स्थिति"],
+  ["P2U:JolSt", "व्यक्ति"],
+  ["P2U:lIf", "क्षि"],
+  ["P2U:cfly{s", "आर्थिक"],
+  ["P2U:sLlt{ sf", "कीर्ति का"],
+  ["P2U:sfTof{", "कार्त्या"],
+  ["P2U:If]", "क्षे"],
+  ["P2U:0f]", "णे"],
+  ["P2U:if]", "षे"],
+  ["P2U:lk|o", "प्रिय"],
+  ["P2U:dTo{", "मर्त्य"],
+  ["U2P:प्रिय", "lk|o"],
+  ["U2P:क्रिया", "ls|of"],
+  ["U2P:मर्त्य", "dTo{"],
+  ["U2P:Simple Tt", "Simple Tt"],
+]);
 // Deliberate extensions: upstream P2U has no mapping for '¿' (रू, emitted by
 // upstream U2P itself) or '«' (ra-foot after ट/ठ/ड, emitted by upstream U2P),
 // so upstream round-trips lose them. The JS port maps ¿->रू and «->्र.
 const EXPECTED_EXTENSIONS = new Map([
   ["P2U:6«", "ट्र"],
   ["P2U:¿", "रू"],
+  ["P2U:´", "झ"],
 ]);
 for (const s of PREETI_INPUTS) {
   const expected = runPython(p2uSrc, s);
@@ -70,6 +93,9 @@ for (const s of PREETI_INPUTS) {
     } else if (EXPECTED_EXTENSIONS.get("P2U:" + s) === actual) {
       intentional++;
       console.log(`P2U EXTENSION ${JSON.stringify(s)}: js=${JSON.stringify(actual)} (added) py=${JSON.stringify(expected)} (upstream passthrough)`);
+    } else if (FIXED_UPSTREAM_BUGS.get("P2U:" + s) === actual) {
+      intentional++;
+      console.log(`P2U FIXED ${JSON.stringify(s)}: js=${JSON.stringify(actual)} py=${JSON.stringify(expected)} (upstream reordering bug)`);
     } else {
       mismatches++;
       console.log(`P2U MISMATCH ${JSON.stringify(s)}: js=${JSON.stringify(actual)} py=${JSON.stringify(expected)}`);
@@ -84,6 +110,9 @@ for (const s of UNI_INPUTS) {
     if (EXPECTED_DEVIATIONS.get("U2P:" + s) === actual) {
       intentional++;
       console.log(`U2P INTENTIONAL ${JSON.stringify(s)}: js=${JSON.stringify(actual)} (correct) py=${JSON.stringify(expected)} (upstream end-of-string bug)`);
+    } else if (FIXED_UPSTREAM_BUGS.get("U2P:" + s) === actual) {
+      intentional++;
+      console.log(`U2P FIXED ${JSON.stringify(s)}: js=${JSON.stringify(actual)} py=${JSON.stringify(expected)} (upstream reordering bug)`);
     } else {
       mismatches++;
       console.log(`U2P MISMATCH ${JSON.stringify(s)}: js=${JSON.stringify(actual)} py=${JSON.stringify(expected)}`);
