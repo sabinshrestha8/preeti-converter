@@ -84,9 +84,19 @@ export default function Home() {
               <ul>
                 <li>Conversion is not perfectly reversible: Preeti and Unicode cover slightly different character sets.</li>
                 <li>A syllable split across two differently formatted Word runs converts per-run.</li>
-                <li>English letters and digits typed in the source encoding are interpreted as Nepali keystrokes.</li>
+                <li>
+                  Preeti → Unicode treats all English letters and digits as Preeti keystrokes, including English text
+                  in other fonts inside a Word document.
+                </li>
                 <li>Password-protected or corrupted documents are rejected with an explanation.</li>
               </ul>
+              <h3>Credits</h3>
+              <p>
+                The conversion engine is adapted from{" "}
+                <a href="https://github.com/globalpolicy/PreetiToUnicode">PreetiToUnicode</a> and{" "}
+                <a href="https://github.com/globalpolicy/UnicodeToPreeti">UnicodeToPreeti</a> by Global Policy (MIT
+                License).
+              </p>
               <h3>Privacy</h3>
               <p>
                 Text and documents are processed locally in your browser. Nothing is uploaded, logged, or stored on any

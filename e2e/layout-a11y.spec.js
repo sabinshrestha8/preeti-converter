@@ -38,3 +38,14 @@ test("key controls expose accessible names", async ({ page }) => {
   await page.getByRole("tab", { name: "Word Document" }).click();
   await expect(page.getByLabel("Choose file")).toBeAttached();
 });
+
+test("privacy and 404 pages have exactly one h1", async ({ page }) => {
+  await page.goto("/privacy");
+  await expect(page.locator("h1")).toHaveCount(1);
+  await expect(page.locator("h1")).toHaveText("Privacy policy");
+  const res = await page.goto("/no-such-page");
+  expect(res.status()).toBe(404);
+  await expect(page.locator("h1")).toHaveText("Page not found");
+  await expect(page.locator('meta[name="robots"][content*="noindex"]')).not.toHaveCount(0);
+  await expect(page.locator('link[rel="canonical"]')).toHaveCount(0);
+});

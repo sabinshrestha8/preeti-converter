@@ -10,9 +10,9 @@ The engine is a JavaScript port of two MIT-licensed Python implementations:
   [globalpolicy/UnicodeToPreeti](https://github.com/globalpolicy/UnicodeToPreeti) (MIT).
 
 Both files were fetched, read in full (58-line mapping core + rules), and their
-licenses verified (MIT `LICENSE` files in each repo, commercial use permitted
-with attribution). Attribution is kept in the source headers of
-`lib/converter/`.
+licenses verified (MIT `LICENSE` files in each repo; MIT requires the copyright
+and permission notice to be included). The full notice is in
+`THIRD_PARTY_NOTICES.md`; source headers in `lib/converter/` credit the upstream.
 
 ## Rejected candidates
 
@@ -30,8 +30,11 @@ with attribution). Attribution is kept in the source headers of
   `.` → `।`, `\` → halant, `{` → reph, `|` → ra-foot, …).
 - Multi-keystroke sequences fold first: `km`→फ, `0f`→ण, `If`→क्ष, `if`→ष,
   `cf`→आ, `f]`→ो, `qm`→`s|`.
-- Context rules: Preeti `l` (ि) is typed before its consonant and reordered
-  after it; `{` (र्) is typed after its cluster and moved before it.
+- Context rules: Preeti `l` (ि) is typed before its conjunct cluster and is
+  placed after the cluster's last consonant; `{` (र्) is typed after its
+  syllable and moved before the whole cluster. Both are reordered after
+  mapping, in Unicode, using private-use placeholders so Unicode text already
+  present in the input is never reordered.
   Reverse direction mirrors this with 1–3 character lookahead plus composite
   replacements (`Si`→`I` क्ष, `` H` ``→`1` ज्ञ, `Tt`→`Q` त्त, `z|`→`>` श्र,
   `/’`→`?` रु, `/"`→`¿` रू, `b\j`→`å` द्व, …).
@@ -42,7 +45,7 @@ with attribution). Attribution is kept in the source headers of
    `try/except IndexError`, so a reph at end-of-string aborts the whole branch:
    `s{`→कर् (wrong), `O{`→इर्, `र्क`→`/\\s` (broken). The JS port compares
    against `undefined` instead of throwing, completing the branch: `s{`→र्क,
-   `र्क`→`s{`. Linguistically correct and round-trips.
+   `र्क`→`s{` (`O{` is now folded to ई, see 6). Linguistically correct and round-trips.
 2. **Two mappings added.** Upstream U2P emits `¿` (रू) and `«` (ra-foot after
    ट/ठ/ड) but upstream P2U cannot read them back (silent loss). The port maps
    `¿`→रू and `«`→्र.
@@ -52,27 +55,38 @@ with attribution). Attribution is kept in the source headers of
    their obvious siblings, and cannot read back its own `ª` (ङ): the port
    adds `f}`→ौ, `cf]`→ओ, `cf}`→औ (longest-match first so `cf]` never
    misreads as `cf`+`]`), and `ª`→ङ. Verified by round-trip tests.
+5. **Cluster-aware reordering (2026-10-17).** Upstream moves ikar/reph over a
+   single keystroke, so conjuncts break (`l:ylt`→स्िथति, `cfly{s`→आर्थकि,
+   `sfTof{`→कात्र्या), folds `f]` before `If`/`0f`/`if` (`If]`→क्ष्ो),
+   misorders ra-foot + ikar in U2P (`प्रिय`→`k|lo`), and applies its U2P
+   post-replacements to English (`Simple`→`Imple`). All fixed; each case is
+   listed in `tests/parity-upstream.mjs` and pinned in `tests/converter.test.js`.
+   `´`→झ added (U2P emits it; upstream cannot read it back).
+6. **ई and ऊ read back (2026-10-17).** Upstream U2P writes ई as `O{` and ऊ
+   as `pm`, but upstream P2U reads them as इर्/उफ. The port folds `O{`→ई and
+   `pm`→ऊ: reph never sits on a bare इ in Nepali, and a genuine उफ is typed
+   `pkm`.
 
 ## Verification evidence
 
-- `tests/converter.test.js`: 72 tests with hand-checked fixtures (canonical
+- `tests/converter.test.js`: 132 tests with hand-checked fixtures (canonical
   `g]kfn`↔`नेपाल` from multiple published READMEs, `sf7df08"`→`काठमाण्डू`,
   `/fd`→`राम`, digits, conjuncts, reph, ikar, round trips). All pass.
 - `tests/parity-upstream.mjs` (`npm run test:parity`, needs Python + the two
-  upstream files): 58 shared fixtures — 53 byte-identical, 3 fixed bugs, 2
-  added mappings. Result on 2026-10-15: `checked=58 mismatches=0 intentional=5`.
+  upstream files): 82 shared fixtures — 60 byte-identical, 17 fixed upstream
+  bugs, 5 added mappings. Result on 2026-10-17:
+  `checked=82 mismatches=0 intentional=22`.
 
 ## Known limitations
 
-- `O{` (ई) reads back as र्इ (inherited upstream ambiguity; locked by test).
 - ASCII letters/digits are legitimate Preeti keystrokes, so English text in the
   source encoding converts to Nepali rather than passing through.
 - Latin digits pass through Unicode → Preeti unchanged (upstream behavior):
   they render as conjunct glyphs in the Preeti font. Convert digits to
-  Devanagari (१२३) first when that matters.
-- `O{` (ई) reads back as र्इ, and lone `pm` (from ऊ) reads back as उफ:
-  upstream ambiguities kept deliberately (fixing them would corrupt the
-  rarer genuine reph/`उफ` cases). Both are locked by tests.
+  Devanagari (१२३) first when that matters. ASCII `? . / ; : ' "` also pass
+  through and read back as Preeti keys (`?`→रु).
+- Unicode → Preeti turns `-` into a space (upstream mapping) and leaves ऋ, ः
+  and ऐ as Unicode (no Preeti mapping). Pinned by tests.
 - Round trips are lossless for the tested subset only; see `tests/` for the
   documented lossy cases (`I`→क्ष् one-way, `qm` one-way normalization).
 - No normalization is applied to legacy-encoded input before mapping (it is not

@@ -14,12 +14,27 @@ test("pastes Preeti and sees live Unicode output", async ({ page }) => {
 
 test("sample, clear and character counts work", async ({ page }) => {
   await page.getByRole("button", { name: "Load sample" }).click();
-  const out = await page.locator("#converter-output").inputValue();
-  expect(out.length).toBeGreaterThan(0);
-  expect(out).toContain("नेपाल");
+  await expect(page.locator("#converter-output")).toHaveValue("नेपाल सरकार\nसरकार नेपाल हो");
+  await expect(page.locator(".count").first()).toHaveText("27 characters");
   await page.getByRole("button", { name: "Clear" }).click();
   await expect(page.locator("#converter-input")).toBeEmpty();
   await expect(page.locator("#converter-output")).toBeEmpty();
+  await expect(page.locator(".count")).toHaveText(["0 characters", "0 characters"]);
+  await expect(page.getByRole("button", { name: "Clear" })).toBeDisabled();
+});
+
+test("converts Unicode to Preeti with exact output", async ({ page }) => {
+  await page.getByRole("button", { name: "Unicode → Preeti" }).first().click();
+  await page.locator("#converter-input").fill("प्रिय नेपाल, Nepal");
+  await expect(page.locator("#converter-output")).toHaveValue("lk|o g]kfn, Nepal");
+});
+
+test("Unicode to Preeti sample and swap back", async ({ page }) => {
+  await page.getByRole("button", { name: "Unicode → Preeti" }).first().click();
+  await page.getByRole("button", { name: "Load sample" }).click();
+  await expect(page.locator("#converter-output")).toHaveValue("g]kfn ;/sf/\n;/sf/ g]kfn xf]");
+  await page.getByRole("button", { name: /Swap/ }).click();
+  await expect(page.locator("#converter-output")).toHaveValue("नेपाल सरकार\nसरकार नेपाल हो");
 });
 
 test("copies output to the clipboard", async ({ page }) => {

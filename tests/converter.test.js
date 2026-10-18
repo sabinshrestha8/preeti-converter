@@ -58,8 +58,9 @@ describe("Preeti -> Unicode", () => {
     assert.equal(convertPreetiToUnicode("A"), "ब्");
   });
 
-  it("known limitation: O{ (ई) reads back as र्इ, not ई", () => {
-    assert.equal(convertPreetiToUnicode("O{"), "र्इ");
+  it("O{ (ई) reads back as ई, not र्इ", () => {
+    assert.equal(convertPreetiToUnicode("O{"), "ई");
+    assert.equal(convertPreetiToUnicode(";a}nfO{"), "सबैलाई");
   });
 
   it("trailing ikar is kept, not silently dropped (split-run safety)", () => {
@@ -142,8 +143,103 @@ describe("dispatcher + round trips", () => {
     // क्ष (If) does not survive a P->U->P trip through 'I'.
     assert.equal(convertPreetiToUnicode("I"), "क्ष्");
     assert.equal(convertUnicodeToPreeti("क्ष्"), "If\\");
-    // Lone 'pm' (from ऊ) reads back as उफ: kept deliberately, since folding
-    // pm->ऊ would corrupt genuine उ+फ sequences.
-    assert.equal(convertPreetiToUnicode("pm"), "उफ");
+  });
+
+  it("pm reads back as ऊ; a genuine उफ is typed pkm", () => {
+    assert.equal(convertPreetiToUnicode("pm"), "ऊ");
+    assert.equal(convertPreetiToUnicode("pkm"), "उफ");
+    assert.equal(convertUnicodeToPreeti("उफ"), "pkm");
+  });
+});
+
+// Release-readiness regressions (docs/release-readiness-audit.md). Each P2U
+// case below produced a visibly broken result before the fix (shown in the
+// comment); expected values are hand-checked code-point sequences.
+describe("regressions: Preeti -> Unicode reordering", () => {
+  const cases = [
+    ["ikar before half-form conjunct", "l:ylt", "स्थिति"], // was स्िथति
+    ["ikar before two-half conjunct", "JolSt", "व्यक्ति"], // was व्यक्ित
+    ["ikar before folded ksha", "lIf", "क्षि"], // was कि्ष
+    ["ikar before folded kra", "lqm", "क्रि"], // was कि्र
+    ["ikar before ra-foot cluster", "lk|o", "प्रिय"],
+    ["reph + ikar mid-word", "cfly{s", "आर्थिक"], // was आर्थकि
+    ["reph + ikar before a space", "sLlt{ sf", "कीर्ति का"], // was कीर्त िका
+    ["reph over a conjunct", "sfTof{", "कार्त्या"], // was कात्र्या
+    ["reph over half-form cluster", "dTo{", "मर्त्य"],
+    ["reph over consonant + aa-kar", "sf{", "र्का"],
+    ["reph over consonant + e-kar", "s]{", "र्के"],
+    ["ksha + e-kar", "If]", "क्षे"], // was क्ष्ो
+    ["nna + e-kar", "0f]", "णे"], // was ण्ो
+    ["ssa + e-kar", "if]", "षे"], // was ष्ो
+    ["conjunct + ai-kar", "If}", "क्षै"],
+    ["jha", "´", "झ"], // was passed through as ´
+    ["stray ikar before a space stays put", "l ", "ि "], // was  ि
+    ["stray ikar before a newline stays put", "l\n", "ि\n"],
+    ["stray reph at start stays put", "{s", "र्क"],
+    ["CRLF and tabs preserved", "g]kfn\r\n;/sf/\tsf", "नेपाल\r\nसरकार\tका"],
+  ];
+  for (const [name, input, expected] of cases) {
+    it(name, () => assert.equal(convertPreetiToUnicode(input), expected));
+  }
+
+  it("Unicode Devanagari already in the input passes through unreordered", () => {
+    assert.equal(convertPreetiToUnicode("किताब"), "किताब");
+    assert.equal(convertPreetiToUnicode("g]kfn किताब"), "नेपाल किताब");
+  });
+
+  it("pinned: Latin digits are Preeti keys, not numbers", () => {
+    // Preeti types Devanagari digits with !@#...; 0-9 are consonant keys.
+    assert.equal(convertPreetiToUnicode("123"), "ज्ञद्दघ");
+  });
+});
+
+describe("regressions: Unicode -> Preeti", () => {
+  const cases = [
+    ["ra-foot + ikar", "प्रिय", "lk|o"], // was k|lo (reads back प्रयि)
+    ["ra-foot + ikar + aa-kar", "क्रिया", "ls|of"], // was s|lof
+    ["half-ssa + tta + ra-foot + ikar", "राष्ट्रिय", "/fli6«o"],
+    ["reph over half-form cluster", "मर्त्य", "dTo{"], // was d/\To (visible halant)
+    ["reph + aa-kar", "र्का", "sf{"],
+    ["ikar on two-half conjunct", "व्यक्ति", "JolSt"],
+    ["jha", "झ", "´"],
+    ["English word is not rewritten", "Simple", "Simple"], // was Imple
+    ["English 'Tt' is not folded to tta", "Tt", "Tt"], // was Q
+    ["mixed Nepali and English", "नेपाल Nepal सरकार", "g]kfn Nepal ;/sf/"],
+    ["CRLF and tabs preserved", "नेपाल\r\nसरकार\tका", "g]kfn\r\n;/sf/\tsf"],
+  ];
+  for (const [name, input, expected] of cases) {
+    it(name, () => assert.equal(convertUnicodeToPreeti(input), expected));
+  }
+
+  it("pinned lossy/unsupported mappings (documented, not fixed)", () => {
+    // Hyphen becomes a space (upstream mapping; Preeti '-' is '(').
+    assert.equal(convertUnicodeToPreeti("नेपाल-भारत"), "g]kfn ef/t");
+    // Latin digits and ASCII punctuation pass through, so they read back as
+    // Preeti keystrokes (123 -> ज्ञद्दघ, ? -> रु).
+    assert.equal(convertUnicodeToPreeti("१२३ 123?"), "!@# 123?");
+    // ऋ, ः and ऐ have no Preeti mapping and are left as Unicode.
+    assert.equal(convertUnicodeToPreeti("ऋषि दुःख ऐन"), "ऋlif b'ःv ऐg");
+  });
+});
+
+describe("regressions: sentence round trips", () => {
+  const sentences = [
+    "नेपाल सरकारको आर्थिक स्थिति राष्ट्रिय प्राथमिकता हो।",
+    "कार्यक्रम पूर्व धर्म वर्षा",
+    "व्यक्तिगत विवरण\r\nप्रिय मित्र\tक्रिया",
+    "क्षेत्रीय कार्यालय, काठमाडौं",
+    "शिक्षा मन्त्रालय द्वितीय उद्धार सम्झौता झापा",
+    "संविधान २०७२ श्रीमान् कृषि",
+  ];
+  for (const s of sentences) {
+    it(`U->P->U: ${JSON.stringify(s)}`, () => {
+      assert.equal(convertPreetiToUnicode(convertUnicodeToPreeti(s)), s);
+    });
+  }
+
+  it("ई and ऊ round trip", () => {
+    for (const s of ["ईश्वर", "ऊर्जा", "सबैलाई ऊन"]) {
+      assert.equal(convertPreetiToUnicode(convertUnicodeToPreeti(s)), s);
+    }
   });
 });

@@ -1,14 +1,22 @@
 # Testing
 
-Framework: Node built-in test runner (`node:test` + `node:assert/strict`), zero
-test dependencies. Commands:
+Unit/integration: Node built-in test runner (`node:test` +
+`node:assert/strict`). Browser: `@playwright/test` (dev dependency). Commands:
 
-- `npm test` — converter + document suites (111 tests, all passing).
-- `npm run test:e2e` — 15 Playwright browser tests against the production
-  build (text flows, clipboard, swap, DOCX upload/convert/download, error
-  states, keyboard, mobile layout; Chromium).
-- `npm run test:parity` — manual upstream-parity harness (needs Python and the
-  two MIT upstream files in `%TEMP%`; last run 58/58 accounted).
+- `npm test` — 168 tests: `tests/converter.test.js` (132) and
+  `tests/document.test.js` (36).
+- `npm run test:e2e` — 27 Playwright tests against the production build
+  (`next start` on port 3100; Chromium only): both text directions with exact
+  output, sample/clear/counts, copy, swap, DOCX upload → convert → download
+  with the downloaded XML inspected in both directions, oversized/empty/
+  missing-part/encrypted files, stale-result clearing, keyboard-only document
+  flow, no cross-origin or non-GET requests during conversion, 375 px layouts,
+  one `h1` on `/`, `/privacy` and the 404.
+- CI (`.github/workflows/ci.yml`) runs `npm test`, lint and build in job
+  `verify`, and build + `npm run test:e2e` in job `e2e`, on every push and PR.
+- `npm run test:parity` — **manual, not in CI**: compares against the upstream
+  Python (needs Python and the two upstream files in `%TEMP%`). Last run
+  2026-10-17: `checked=82 mismatches=0 intentional=22`.
 - `npm run lint`, `npm run build` — clean.
 
 ## Mapping fixtures
@@ -22,18 +30,24 @@ empty input, non-string input, a long paragraph, and lossless/lossy round trips.
 ## DOCX fixtures
 
 Synthetic packages built in-code with JSZip (no binaries in the repo):
-one-paragraph, multi-paragraph, bold/italic, font sizes, headings, tables,
-lists (numbering preserved structurally), headers/footers, hyperlinks, 1px PNG
-image, page breaks, split runs, empty runs, 800-paragraph long document
-(~0.35 s), malformed ZIPs, missing `document.xml`, oversized input, unknown
-direction. Integrity checks: ZIP magic, required parts, parseable XML,
-byte-identical media/rels, unchanged input hash, structure regexes.
+paragraphs, bold runs, tables, list numbering (`w:numPr` + untouched
+`numbering.xml`), headers/footers, footnotes/endnotes/comments, hyperlinks,
+1px PNG image, field codes, tracked deletions, `w:cs`/theme fonts, mixed
+Calibri English + Preeti, split runs (merge and barrier cases), empty body,
+an 800-paragraph and a 1,600-paragraph (~40 pages of text) document,
+non-ZIP/empty/oversized/OLE input, missing `document.xml`, malformed XML,
+undefined entities, a declared-size zip bomb, entry/size limits. Integrity
+checks: ZIP magic, required parts, parseable XML, byte-identical media/rels,
+unchanged input hash, structure regexes. Not covered by fixtures: italic,
+font sizes, headings, page breaks, nested tables, text boxes, SmartArt/charts.
 
 ## Known gaps (honest)
 
-- Playwright covers customer journeys in Chromium only (no Firefox/WebKit
-  matrix yet) and cannot open output in real Microsoft Word (no Word license
-  in this environment); document integrity is established structurally.
-  A real-Word round-trip remains recommended before launch claims.
-- Performance measured on synthetic docs; a corpus of real 30–40-page
-  government documents should be timed during pilot.
+- **No real-document testing has been performed.** No real `.docx` has been
+  converted and opened in Microsoft Word or LibreOffice; integrity is
+  established structurally only. Layout preservation is unverified.
+- Playwright runs Chromium only (no Firefox/WebKit, no real touch devices).
+- Performance is measured on repetitive synthetic documents in Node; real
+  30–40-page documents should be timed in a browser on low-end hardware.
+- Fixtures are a sample: passing tests do not mean every input converts
+  correctly.
